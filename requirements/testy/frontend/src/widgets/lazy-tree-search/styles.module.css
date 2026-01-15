@@ -1,0 +1,39 @@
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-height: 16px;
+  color: var(--y-color-text-primary);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  cursor: pointer;
+  width: 100%;
+  padding: 0 2px;
+}
+
+.activeRow {
+  color: var(--y-color-accent);
+}
+
+.searchContainer {
+  position: relative;
+}
+
+.searchDropdown {
+  position: absolute;
+  top: 34px;
+  left: 0;
+  background-color: var(--y-color-background);
+  width: 100%;
+  max-height: 300px;
+  overflow: hidden;
+  overflow-y: auto;
+  z-index: 2;
+  padding: 4px;
+  box-sizing: border-box;
+  box-shadow:
+    0 6px 16px 0 rgba(0, 0, 0, 0.08),
+    0 3px 6px -4px rgba(0, 0, 0, 0.12),
+    0 9px 28px 8px rgba(0, 0, 0, 0.05);
+}

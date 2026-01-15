@@ -1,0 +1,29 @@
+.searchBlock {
+  height: 36px;
+  border-bottom: 1px solid var(--y-grey-20);
+}
+
+.input {
+  height: 100%;
+}
+
+.arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  transition: transform 0.1s;
+}
+
+.arrow.expanded {
+  transform: rotate(90deg);
+}
+
+.treeRow {
+  cursor: pointer;
+}
+
+.treeRow:hover {
+  background-color: var(--y-color-background-alternative);
+}

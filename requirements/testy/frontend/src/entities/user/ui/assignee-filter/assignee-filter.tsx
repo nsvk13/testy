@@ -1,0 +1,245 @@
+import { Select, Spin } from "antd"
+import { useMeContext } from "processes"
+import { SelectHandler } from "rc-select/lib/Select"
+import { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
+import { useInView } from "react-intersection-observer"
+
+import { useLazyGetUserByIdQuery, useLazyGetUsersQuery } from "entities/user/api"
+import { useRecentlyUsers } from "entities/user/model"
+
+import { NOT_ASSIGNED_FILTER_VALUE } from "shared/constants"
+
+import { UserSearchOption } from "../user-search-option"
+
+interface Props {
+  value?: string[]
+  onChange: (value?: string[]) => void
+  onClear: () => void
+  placeholder?: string
+  project?: Project
+  onClose?: () => void
+}
+
+const PAGE_SIZE = 10
+
+export const AssigneeFilter = ({
+  value,
+  placeholder,
+  project,
+  onChange,
+  onClear,
+  onClose,
+}: Props) => {
+  const { t } = useTranslation(["translation", "entities"])
+  const { me } = useMeContext()
+
+  const [search, setSearch] = useState<string>("")
+  const [searchUsers, setSearchUsers] = useState<User[]>([])
+  const [selectedUsers, setSelectedUsers] = useState<User[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [isLoadingInitUsers, setIsLoadingInitUsers] = useState(false)
+
+  const [getUsers] = useLazyGetUsersQuery()
+  const [getUserById] = useLazyGetUserByIdQuery()
+  const [isLastPage, setIsLastPage] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+
+  const { ref, inView } = useInView()
+  const [currentPage, setCurrentPage] = useState(1)
+  const { recentlyUsers, handleAddRecentlyUser } = useRecentlyUsers()
+
+  const filterUsersSearch = (result: User[]) => {
+    const selectedIds = new Set(selectedUsers.map((user) => user.id))
+    return result.filter((user) => !selectedIds.has(user.id) && user.id !== me?.id)
+  }
+
+  const handleSearch = async (newValue: string) => {
+    setCurrentPage(1)
+
+    if (!newValue.length) {
+      setSearchUsers([])
+      setSearch("")
+      setIsLastPage(false)
+      return
+    }
+
+    const additionalFilter = project
+      ? { [project.is_private ? "project" : "exclude_external"]: project.id }
+      : {}
+
+    setIsLoading(true)
+    const res = await getUsers({
+      page: 1,
+      page_size: PAGE_SIZE,
+      username: newValue,
+      ...additionalFilter,
+    }).unwrap()
+
+    if (!res.pages.next) {
+      setIsLastPage(true)
+    }
+
+    setSearchUsers(filterUsersSearch(res.results))
+    setSearch(newValue)
+    setIsLoading(false)
+  }
+
+  const handleChange = (dataValue: string[]) => {
+    if (!dataValue.length) {
+      onClear()
+      return
+    }
+
+    onChange(dataValue)
+  }
+
+  const handleSelect: SelectHandler<string, { children: { props: { user: User } } }> = (_, opt) => {
+    if (opt.children?.props?.user) {
+      handleAddRecentlyUser(opt.children.props.user)
+    }
+  }
+
+  const handleDropdownVisibleChange = (toggle: boolean) => {
+    setIsOpen(toggle)
+    if (!toggle) {
+      onClose?.()
+    }
+  }
+
+  useEffect(() => {
+    if (!inView || !search.length) return
+
+    const fetch = async () => {
+      setIsLoadingMore(true)
+
+      const additionalFilter = project
+        ? { [project.is_private ? "project" : "exclude_external"]: project.id }
+        : {}
+
+      const res = await getUsers({
+        page: currentPage + 1,
+        page_size: PAGE_SIZE,
+        username: search,
+        ...additionalFilter,
+      }).unwrap()
+
+      if (!res.pages.next) {
+        setIsLastPage(true)
+      }
+
+      const filteredResults = filterUsersSearch(res.results)
+      setSearchUsers((prevState) => [...prevState, ...filteredResults])
+      if (res.pages.current < res.pages.total) {
+        setCurrentPage((prev) => prev + 1)
+      }
+      setIsLoadingMore(false)
+    }
+
+    fetch()
+  }, [inView, search])
+
+  useEffect(() => {
+    if (!value?.length || isLoadingInitUsers || selectedUsers.length) {
+      return
+    }
+
+    const assignedUserIdsFromFilter = value.filter(
+      (i) => i !== String(me?.id) && i !== "null" && i.length
+    )
+
+    const fetchUsers = async () => {
+      setIsLoadingInitUsers(true)
+      try {
+        const loadedUsers = await Promise.all(
+          assignedUserIdsFromFilter.map((userId) => getUserById(Number(userId)).unwrap())
+        )
+        setSelectedUsers(loadedUsers)
+        setIsLastPage(true)
+      } catch (error) {
+        console.error("Failed to load users", error)
+      } finally {
+        setIsLoadingInitUsers(false)
+      }
+    }
+    fetchUsers()
+  }, [value, isLoadingInitUsers, me])
+
+  useEffect(() => {
+    const valueIdsSet = new Set(selectedUsers.map((user) => user.id))
+    const searchUsersFiltered = searchUsers.filter((user) => !valueIdsSet.has(user.id))
+    setSearchUsers(searchUsersFiltered)
+  }, [selectedUsers])
+
+  return (
+    <Select
+      id="assignee-filter"
+      value={value ?? []}
+      mode="multiple"
+      showSearch
+      loading={isLoadingInitUsers || isLoading}
+      placeholder={placeholder ?? t("Search a user")}
+      defaultActiveFirstOption={false}
+      filterOption={false}
+      onSearch={handleSearch}
+      onChange={handleChange}
+      onSelect={handleSelect}
+      onClear={onClear}
+      open={isOpen}
+      onOpenChange={handleDropdownVisibleChange}
+      notFoundContent={
+        <span style={{ color: "var(--y-color-control-placeholder)" }}>{t("No matches")}</span>
+      }
+      allowClear
+      style={{ width: "100%" }}
+    >
+      <Select.Option value={NOT_ASSIGNED_FILTER_VALUE} data-testid="assignee-filter-not-assigned">
+        {t("entities:user.NotAssigned")}
+      </Select.Option>
+      {me && (
+        <Select.Option value={String(me.id)} data-testid="assignee-filter-me">
+          <UserSearchOption user={me} />
+        </Select.Option>
+      )}
+      {!!recentlyUsers.length && (
+        <Select.OptGroup label={t("entities:user.RecentUsers")}>
+          {recentlyUsers.map((user) => (
+            <Select.Option
+              key={`${user.id}-recently`}
+              value={String(user.id)}
+              data-testid={`assignee-filter-recently-user-${user.username}`}
+            >
+              <UserSearchOption user={user} />
+            </Select.Option>
+          ))}
+        </Select.OptGroup>
+      )}
+      {!isLoading && !!searchUsers.length && (
+        <Select.OptGroup label={t("entities:user.SearchUsers")}>
+          {searchUsers.map((user) => (
+            <Select.Option
+              key={`${user.id}-search`}
+              value={String(user.id)}
+              data-testid={`assignee-filter-user-${user.username}`}
+            >
+              <UserSearchOption user={user} />
+            </Select.Option>
+          ))}
+        </Select.OptGroup>
+      )}
+      {!!searchUsers.length && !isLastPage && !isLoadingMore && (
+        <Select.Option value="" data-testid="assignee-filter-load-more-ref">
+          <div ref={ref} />
+        </Select.Option>
+      )}
+      {isLoadingMore && (
+        <Select.Option value="" data-testid="assignee-filter-loader">
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+            <Spin />
+          </div>
+        </Select.Option>
+      )}
+    </Select>
+  )
+}

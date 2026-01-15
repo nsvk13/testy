@@ -1,0 +1,80 @@
+.switcher {
+  margin-bottom: 8px;
+}
+
+.filterBtn {
+  margin-left: 8px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+  white-space: nowrap;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.form {
+  padding: 0 4px;
+  margin-bottom: 8px;
+}
+.filterBtn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid var(--y-grey-20);
+}
+
+.labelWrapper {
+  display: flex;
+}
+
+.labelWrapper > label {
+  width: 100%;
+}
+
+.labelsCondition {
+  margin-bottom: auto;
+  margin-left: auto;
+}
+
+.fieldLabel {
+  display: flex;
+  height: 22px;
+}
+
+.fieldName {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--y-color-text-primary-hover);
+}
+
+.selectedInfo {
+  font-size: 14px;
+  font-weight: 400;
+  margin-right: 4px;
+}
+
+.labelsFilter {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.treeRow {
+  cursor: pointer;
+}
+
+.treeRow:hover {
+  background-color: var(--y-color-background-alternative);
+}

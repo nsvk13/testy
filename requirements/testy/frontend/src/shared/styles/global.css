@@ -1,0 +1,145 @@
+@font-face {
+  font-family: "Inter";
+  src:
+    local("Inter"),
+    url("../assets/fonts/Inter-VariableFont.ttf") format("truetype");
+}
+
+* {
+  font-family: "Inter", sans-serif;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  background-color: var(--y-color-background);
+}
+
+button {
+  text-transform: uppercase;
+  box-shadow: none;
+}
+
+a {
+  color: var(--y-color-link);
+}
+
+a:hover {
+  color: var(--y-color-link-hover);
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+/* scroll */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--y-color-background);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--y-color-scrollbar-thumb);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--y-color-scrollbar-thumb);
+}
+
+ul {
+  padding-left: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  padding: 0;
+  margin: 0;
+}
+
+h1,
+h2 {
+  line-height: 32px;
+}
+
+h3,
+h4 {
+  line-height: 24px;
+}
+
+h5,
+h6 {
+  line-height: 16px;
+}
+
+.recharts-default-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recharts-legend-item {
+  display: flex !important;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+}
+
+.recharts-legend-item-text {
+  width: 100%;
+}
+
+.link-button {
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  margin-left: auto;
+  cursor: pointer;
+  color: var(--y-color-accent);
+}
+
+::-webkit-input-placeholder {
+  color: var(--y-color-control-placeholder) !important;
+  opacity: 0.5;
+}
+::-moz-placeholder {
+  color: var(--y-color-control-placeholder) !important;
+  opacity: 0.5;
+}
+
+.ant-tree .ant-tree-checkbox {
+  margin-top: 4px;
+  align-self: flex-start;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--y-color-control-background) inset !important;
+}
+
+input:-webkit-autofill {
+  -webkit-text-fill-color: var(--y-color-control-text) !important;
+}
+
+.recharts-tooltip {
+  border: 1px solid var(--y-color-control-border) !important;
+  background-color: var(--y-color-background) !important;
+}
+
+.recharts-tooltip ul * {
+  color: var(--y-color-control-text);
+}
+
+.y-button.-y-circle,
+.y-button.-y-square {
+  font-size: inherit;
+}

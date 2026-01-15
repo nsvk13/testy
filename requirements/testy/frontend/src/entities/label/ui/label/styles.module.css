@@ -1,0 +1,22 @@
+.label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  width: fit-content;
+  margin-right: 0;
+  user-select: none;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 14px;
+  max-width: 14px;
+  margin-left: 4px;
+}
+
+.btn:hover {
+  background-color: var(--y-color-secondary-hover);
+}

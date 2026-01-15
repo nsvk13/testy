@@ -1,0 +1,13 @@
+.action {
+  transition: all 0.2s ease-in;
+  color: var(--y-grey-30);
+  width: 100%;
+}
+
+.action svg {
+  cursor: pointer;
+}
+
+.action svg:hover {
+  color: var(--y-color-secondary-inline-hover);
+}

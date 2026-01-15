@@ -1,0 +1,51 @@
+.row {
+  margin-bottom: 8px;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+}
+
+.fileIcon {
+  color: var(--y-color-icon);
+  font-size: 18px;
+  min-width: 24px;
+}
+
+.attachNameContainer {
+  display: flex;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.attachName {
+  display: block;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.copyBtn {
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--y-pending-block);
+  transition: all 0.1s ease-in;
+}
+
+.copyBtn:hover {
+  color: var(--y-pending-hover);
+}
+
+.removeBtn {
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--y-error-block);
+}
+
+.copyBtn:hover {
+  color: var(--y-pending-hover);
+}
+
+.removeBtn:hover {
+  color: var(--y-error-hover);
+}

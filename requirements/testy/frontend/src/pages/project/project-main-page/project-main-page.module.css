@@ -1,0 +1,14 @@
+.wrapper {
+  display: flex;
+  flex-direction: row;
+}
+
+.containerContent {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  min-height: 100vh;
+  background-color: var(--y-color-background);
+}

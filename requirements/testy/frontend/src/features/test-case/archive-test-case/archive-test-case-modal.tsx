@@ -1,0 +1,69 @@
+import { useTranslation } from "react-i18next"
+
+import {
+  useArchiveTestCaseMutation,
+  useGetTestCaseArchivePreviewQuery,
+} from "entities/test-case/api"
+
+import { useAntdModals } from "shared/hooks"
+import { AlertSuccessChange } from "shared/ui"
+
+import { ModalConfirmDeleteArchive } from "widgets/[ui]"
+
+interface Props {
+  isShow: boolean
+  setIsShow: (isShow: boolean) => void
+  testCase: TestCase
+  onSubmit?: (testCase: TestCase) => void
+}
+
+export const ArchiveTestCaseModal = ({ isShow, setIsShow, testCase, onSubmit }: Props) => {
+  const { t } = useTranslation()
+  const { antdNotification, initInternalError } = useAntdModals()
+  const [archiveTestCase, { isLoading: isLoadingDelete }] = useArchiveTestCaseMutation()
+  const { data, isLoading, status } = useGetTestCaseArchivePreviewQuery(String(testCase.id), {
+    skip: !isShow,
+  })
+
+  const handleClose = () => {
+    setIsShow(false)
+  }
+
+  const handleArchive = async () => {
+    try {
+      await archiveTestCase(testCase.id).unwrap()
+      antdNotification.success("archive-test-case", {
+        description: (
+          <AlertSuccessChange
+            id={String(testCase.id)}
+            action="archived"
+            title={t("Test Case")}
+            data-testid="archive-test-case-success-notification-description"
+          />
+        ),
+      })
+
+      onSubmit?.(testCase)
+    } catch (err: unknown) {
+      initInternalError(err)
+    }
+
+    handleClose()
+  }
+
+  return (
+    <ModalConfirmDeleteArchive
+      status={status}
+      isShow={isShow}
+      isLoading={isLoading}
+      isLoadingButton={isLoadingDelete}
+      name={testCase.name}
+      typeTitle={t("Test Case")}
+      type="test-case"
+      data={data ?? []}
+      handleClose={handleClose}
+      handleDelete={handleArchive}
+      action="archive"
+    />
+  )
+}

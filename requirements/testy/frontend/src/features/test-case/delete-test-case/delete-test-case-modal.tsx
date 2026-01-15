@@ -1,0 +1,89 @@
+import { useTranslation } from "react-i18next"
+import { useSearchParams } from "react-router-dom"
+
+import { useAppDispatch } from "app/hooks"
+
+import { useLazyGetSuiteTestPlansQuery } from "entities/suite/api"
+
+import { useDeleteTestCaseMutation, useGetTestCaseDeletePreviewQuery } from "entities/test-case/api"
+import { clearDrawerTestCase } from "entities/test-case/model"
+
+import { testPlanCasesIdsInvalidate } from "entities/test-plan/api"
+
+import { useAntdModals } from "shared/hooks"
+import { AlertSuccessChange } from "shared/ui"
+
+import { ModalConfirmDeleteArchive } from "widgets/[ui]/modal-confirm-delete-archive"
+
+interface Props {
+  isShow: boolean
+  setIsShow: (isShow: boolean) => void
+  testCase: TestCase
+  onSubmit?: (testCase: TestCase) => void
+}
+
+export const DeleteTestCaseModal = ({ isShow, setIsShow, testCase, onSubmit }: Props) => {
+  const { t } = useTranslation()
+  const { antdNotification, initInternalError } = useAntdModals()
+  const [deleteTestCase, { isLoading: isLoadingDelete }] = useDeleteTestCaseMutation()
+  const { data, isLoading, status } = useGetTestCaseDeletePreviewQuery(String(testCase.id), {
+    skip: !isShow,
+  })
+  const [searchParams, setSearchParams] = useSearchParams()
+  const dispatch = useAppDispatch()
+
+  const [getPlans] = useLazyGetSuiteTestPlansQuery()
+
+  const handleClose = () => {
+    setIsShow(false)
+  }
+
+  const handleDelete = async () => {
+    try {
+      searchParams.delete("test_case")
+      searchParams.delete("version")
+      setSearchParams(() => {
+        dispatch(clearDrawerTestCase())
+        return searchParams
+      })
+      const plans = await getPlans(testCase.suite.id).unwrap()
+
+      plans.plan_ids.forEach((id) => {
+        dispatch(testPlanCasesIdsInvalidate(id))
+      })
+
+      await deleteTestCase(testCase.id).unwrap()
+      antdNotification.success("delete-test-case", {
+        description: (
+          <AlertSuccessChange
+            id={String(testCase.id)}
+            action="deleted"
+            title={t("Test Case")}
+            data-testid="delete-test-case-success-notification-description"
+          />
+        ),
+      })
+      onSubmit?.(testCase)
+    } catch (err: unknown) {
+      initInternalError(err)
+    }
+
+    handleClose()
+  }
+
+  return (
+    <ModalConfirmDeleteArchive
+      status={status}
+      isShow={isShow}
+      isLoading={isLoading}
+      isLoadingButton={isLoadingDelete}
+      name={testCase.name}
+      typeTitle={t("Test Case")}
+      type="test-case"
+      data={data ?? []}
+      handleClose={handleClose}
+      handleDelete={handleDelete}
+      action="delete"
+    />
+  )
+}

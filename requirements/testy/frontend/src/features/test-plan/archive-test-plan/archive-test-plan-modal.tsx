@@ -1,0 +1,74 @@
+import { useTranslation } from "react-i18next"
+import { useNavigate } from "react-router-dom"
+
+import {
+  useArchiveTestPlanMutation,
+  useGetTestPlanArchivePreviewQuery,
+} from "entities/test-plan/api"
+
+import { useProjectContext } from "pages/project"
+
+import { useAntdModals } from "shared/hooks"
+import { AlertSuccessChange } from "shared/ui"
+
+import { ModalConfirmDeleteArchive } from "widgets/[ui]/modal-confirm-delete-archive"
+
+interface Props {
+  isShow: boolean
+  setIsShow: (toggle: boolean) => void
+  testPlan: TestPlan
+  onSubmit?: (plan: TestPlan) => void
+}
+
+export const ArchiveTestPlanModal = ({ isShow, setIsShow, testPlan, onSubmit }: Props) => {
+  const { t } = useTranslation()
+  const { antdNotification, initInternalError } = useAntdModals()
+  const { id: projectId } = useProjectContext()
+  const [archiveTestPlan, { isLoading: isLoadingDelete }] = useArchiveTestPlanMutation()
+  const { data, isLoading, status } = useGetTestPlanArchivePreviewQuery(String(testPlan.id), {
+    skip: !isShow,
+  })
+
+  const navigate = useNavigate()
+
+  const handleClose = () => {
+    setIsShow(false)
+  }
+
+  const handleArchive = async () => {
+    try {
+      await archiveTestPlan({ testPlanId: testPlan.id, projectId }).unwrap()
+      navigate(`/projects/${testPlan.project}/plans`)
+      antdNotification.success("archive-test-plan", {
+        description: (
+          <AlertSuccessChange
+            id={String(testPlan.id)}
+            action="archived"
+            title={t("Test Plan")}
+            data-testid="archive-test-plan-success-notification-description"
+          />
+        ),
+      })
+      onSubmit?.(testPlan)
+      handleClose()
+    } catch (err: unknown) {
+      initInternalError(err)
+    }
+  }
+
+  return (
+    <ModalConfirmDeleteArchive
+      status={status}
+      isShow={isShow}
+      isLoading={isLoading}
+      isLoadingButton={isLoadingDelete}
+      name={testPlan.name}
+      typeTitle={t("Test Plan")}
+      type="test-plan"
+      data={data ?? []}
+      handleClose={handleClose}
+      handleDelete={handleArchive}
+      action="archive"
+    />
+  )
+}

@@ -1,0 +1,34 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  gap: 8px;
+  margin: 0;
+  max-height: 52px;
+  overflow: hidden;
+}
+
+.maxSize {
+  max-height: max-content !important;
+  overflow: auto;
+}
+
+.showButton {
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--y-color-accent);
+}
+
+.noData {
+  margin-top: 8px;
+  color: var(--y-color-control-text-disabled);
+}

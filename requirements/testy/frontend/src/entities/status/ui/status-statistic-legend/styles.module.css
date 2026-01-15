@@ -1,0 +1,14 @@
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.legendValue {
+  margin-left: auto;
+  font-size: 14px;
+  line-height: 16px;
+  color: var(--y-color-text-primary);
+  justify-self: flex-end;
+  text-wrap: nowrap;
+}

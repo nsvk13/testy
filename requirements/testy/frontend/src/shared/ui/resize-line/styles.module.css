@@ -1,0 +1,19 @@
+.resizeLine {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  z-index: var(--max-z-index);
+  width: 12px;
+  height: 100%;
+  cursor: ew-resize;
+}
+
+.right {
+  right: 0;
+}
+
+.left {
+  left: 0;
+}

@@ -1,0 +1,5 @@
+{
+  "paginationTotal_one": "of {{count}} entry",
+  "paginationTotal_other": "of {{count}} entries",
+  "copyright": "<linkRepoUrl>TestY TMS {{version}}.</linkRepoUrl> Released under the AGPL-v3 License. Have a question or found a bug? <linkIssue>Let us know.</linkIssue><br/>© {{year}} <linkKns>KNS Group LLC (YADRO).</linkKns>"
+}
